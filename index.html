@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Carga de archivos</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <h1>Carga de archivos</h1>
+  <form action="/upload" method="POST" enctype="multipart/form-data">
+    <input type="file" name="files" multiple />
+    <!-- Agrega el atributo "multiple" para admitir la selección de múltiples archivos -->
+    <input type="submit" value="Cargar" />
+  </form>
+
+  <div id="file-info"></div>
+
+  <script>
+    // Script para mostrar los detalles de los archivos cargados
+    const form = document.querySelector('form');
+    const fileInfoDiv = document.querySelector('#file-info');
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const formData = new FormData(form);
+      const response = await fetch('/upload', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (response.ok) {
+        const fileInfo = await response.json();
+        fileInfoDiv.innerHTML = '';
+
+        fileInfo.forEach((file) => {
+          const fileDetails = document.createElement('div');
+          fileDetails.innerHTML = `
+        <p>Nombre: ${file.filename}</p>
+        <p>Nombre original: ${file.originalname}</p>
+        <p>Tamaño: ${file.size} bytes</p>
+        <p>Tipo MIME: ${file.mimetype}</p>
+        <hr>
+      `;
+          fileInfoDiv.appendChild(fileDetails);
+        });
+      } else {
+        fileInfoDiv.innerHTML = 'Error al cargar los archivos.';
+      }
+    });
+  </script>
+</body>
+
+</html>
